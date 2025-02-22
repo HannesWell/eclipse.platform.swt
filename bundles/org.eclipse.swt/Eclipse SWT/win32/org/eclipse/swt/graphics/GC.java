@@ -18,6 +18,7 @@ import org.eclipse.swt.*;
 import org.eclipse.swt.internal.*;
 import org.eclipse.swt.internal.gdip.*;
 import org.eclipse.swt.internal.win32.*;
+import org.eclipse.swt.widgets.*;
 
 /**
  * Class <code>GC</code> is where all of the drawing capabilities that are
@@ -176,6 +177,42 @@ public GC(Drawable drawable, int style) {
 	init (drawable, data, hDC);
 	init();
 }
+
+/**
+ * @since 3.129
+ */
+@Deprecated
+public GC(Control control) {
+	this((Drawable) control);
+}
+
+/**
+ * @since 3.129
+ */
+@Deprecated
+public GC(Control control, int style) {
+	this((Drawable) control, style);
+}
+
+/**
+ * @since 3.129
+ */
+@Deprecated
+public GC(Image image) {
+	this((Drawable) image);
+}
+
+/**
+ * @since 3.129
+ */
+@Deprecated
+public GC(Image  image, int style) {
+	this((Drawable) image, style);
+}
+
+//TODO: or deprecate the original constructor and add only a new one that accepts a Control?
+// or deprecate for all and add draw method for device and Image only? Would allow to remove the drawable interface?
+// Or just use the new Image(ImageGcDrawer) constructor?
 
 static int checkStyle(int style) {
 	if ((style & SWT.LEFT_TO_RIGHT) != 0) style &= ~SWT.RIGHT_TO_LEFT;

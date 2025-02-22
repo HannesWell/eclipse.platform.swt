@@ -31,6 +31,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Drawable;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
@@ -78,7 +79,7 @@ public void tearDown() {
 @Test
 public void test_ConstructorLorg_eclipse_swt_graphics_Drawable() {
 	try {
-		GC gc = new GC(null);
+		GC gc = new GC((Drawable) null);
 		gc.dispose();
 		fail("No exception thrown for drawable == null");
 	} catch (IllegalArgumentException e) {
@@ -104,7 +105,7 @@ public void test_ConstructorLorg_eclipse_swt_graphics_Drawable() {
 @Test
 public void test_ConstructorLorg_eclipse_swt_graphics_DrawableI() {
 	try {
-		GC gc = new GC(null, SWT.LEFT_TO_RIGHT);
+		GC gc = new GC((Drawable) null, SWT.LEFT_TO_RIGHT);
 		gc.dispose();
 		fail("No exception thrown for drawable == null");
 	} catch (IllegalArgumentException e) {

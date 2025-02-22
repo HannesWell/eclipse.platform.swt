@@ -73,7 +73,7 @@ import org.eclipse.swt.internal.gtk.*;
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Examples: GraphicsExample, ImageAnalyzer</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
  */
-public final class Image extends Resource implements Drawable {
+public final class Image extends ReferenceCountedResource implements Drawable {
 
 	/**
 	 * specifies whether the receiver is a bitmap or an icon
@@ -168,6 +168,8 @@ public final class Image extends Resource implements Drawable {
 	 * Attribute to cache current device zoom level
 	 */
 	private int currentDeviceZoom = 100;
+
+	private final Runnable initializer;
 
 Image(Device device) {
 	super(device);
@@ -1556,6 +1558,11 @@ public String toString () {
 	}
 
 	return "Image {" + surface + "}";
+}
+
+@Override
+protected void allocateNativeResource() {
+	this.initializer.run();
 }
 
 }

@@ -41,6 +41,7 @@ import org.eclipse.swt.*;
  *
  * @since 3.1
  */
+//TODO: Mark as @noextend
 public abstract class Resource {
 
 	/**

@@ -13,6 +13,9 @@
  *******************************************************************************/
 package org.eclipse.swt.graphics;
 
+import java.util.function.*;
+
+import org.eclipse.swt.*;
 
 /**
  * Implementers of <code>Drawable</code> can have a graphics context (GC)
@@ -29,8 +32,26 @@ package org.eclipse.swt.graphics;
  * @see Device
  * @see Image
  * @see GC
+ * @noimplement This interface is not intended to be implemented by clients.
+ * @noreference This interface is not intended to be referenced by clients.
  */
 public interface Drawable {
+
+
+	//TODO: Or only add this to image directly and deprecate the GC constructor for Image/Control
+
+	default void draw(Consumer<GC> drawing) {
+		draw(SWT.NONE, drawing);
+	}
+
+	default void draw(int style, Consumer<GC> drawing) {
+		GC gc = new GC(this, style);
+		try {
+			drawing.accept(gc);
+		} finally {
+			gc.dispose();
+		}
+	}
 
 /**
  * Invokes platform specific functionality to allocate a new GC handle.

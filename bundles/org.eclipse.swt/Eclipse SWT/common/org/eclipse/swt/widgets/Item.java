@@ -178,7 +178,26 @@ public void setImage (Image image) {
 	checkWidget ();
 	if (this.image == image) return;
 	if (image != null && image.isDisposed()) error(SWT.ERROR_INVALID_ARGUMENT);
-	this.image = image;
+	this.image = ReferenceCountedResource.resetResource(this.image, image, this);
+}
+
+@Override
+public void dispose() {
+	// TODO Auto-generated method stub
+	super.dispose();
+}
+@Override
+void destroyWidget() {
+	// TODO Auto-generated method stub
+	super.destroyWidget();
+}
+
+@Override
+void releaseHandle() { //TODO: or releaseWidget?
+	if (image != null) {
+		image.unreferenceNativeResource();
+	}
+	super.releaseHandle();
 }
 
 /**

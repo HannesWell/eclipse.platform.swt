@@ -294,6 +294,7 @@ private static ImageData autoScaleImageData (Device device, final ImageData imag
 	int scaledHeight = Math.round (height * scaleFactor);
 	boolean useSmoothScaling = autoScaleMethod == AutoScaleMethod.SMOOTH && imageData.getTransparencyType() != SWT.TRANSPARENCY_MASK;
 	if (useSmoothScaling) {
+		//TODO: Can we avoid the image construction?
 		Image original = new Image (device, (ImageDataProvider) zoom -> imageData);
 		/* Create a 24 bit image data with alpha channel */
 		final ImageData resultData = new ImageData (scaledWidth, scaledHeight, 24, new PaletteData (0xFF, 0xFF00, 0xFF0000));

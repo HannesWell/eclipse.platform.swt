@@ -347,17 +347,14 @@ static Image createThumbnail(Device device, String name) {
  *
  * */
 static Image createImage(Device device, Color color1, Color color2, int width, int height) {
-	Image image = new Image(device, width, height);
-	GC gc = new GC(image);
-	Rectangle rect = image.getBounds();
-	Pattern pattern = new Pattern(device, rect.x, rect.y, rect.width - 1,
-				rect.height - 1, color1, color2);
-	gc.setBackgroundPattern(pattern);
-	gc.fillRectangle(rect);
-	gc.drawRectangle(rect.x, rect.y, rect.width - 1, rect.height - 1);
-	gc.dispose();
-	pattern.dispose();
-	return image;
+	return new Image(device, (gc, imageWidth, imageHeight) -> {
+		Rectangle rect = new Rectangle(0, 0, width, height); //TODO: is 0,0 correct?
+		Pattern pattern = new Pattern(device, rect.x, rect.y, rect.width - 1, rect.height - 1, color1, color2);
+		gc.setBackgroundPattern(pattern);
+		gc.fillRectangle(rect);
+		gc.drawRectangle(rect.x, rect.y, rect.width - 1, rect.height - 1);
+		pattern.dispose();
+	}, width, height);
 }
 
 /**

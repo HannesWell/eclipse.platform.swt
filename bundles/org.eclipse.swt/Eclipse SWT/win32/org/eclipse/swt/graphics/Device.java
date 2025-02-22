@@ -31,7 +31,7 @@ import org.eclipse.swt.widgets.*;
  *
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
  */
-public abstract class Device implements Drawable {
+public abstract class Device implements Drawable { //TODO: what to draw on a device? Printer?
 
 	static boolean strictChecks = System.getProperty("org.eclipse.swt.internal.enableStrictChecks") != null;
 

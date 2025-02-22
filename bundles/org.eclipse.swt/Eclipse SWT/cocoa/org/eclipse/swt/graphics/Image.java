@@ -72,7 +72,7 @@ import org.eclipse.swt.internal.graphics.*;
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Examples: GraphicsExample, ImageAnalyzer</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
  */
-public final class Image extends Resource implements Drawable {
+public final class Image extends ReferenceCountedResource implements Drawable {
 
 	/**
 	 * specifies whether the receiver is a bitmap or an icon
@@ -147,6 +147,8 @@ public final class Image extends Resource implements Drawable {
 	 * same image data provider would be considered equal.
 	 */
 	private int styleFlag = SWT.IMAGE_COPY;
+
+	private final Runnable initializer;
 
 	/**
 	 * Alpha information objects for 100%, 200%
@@ -880,7 +882,7 @@ public Image(Device device, ImageGcDrawer imageGcDrawer, int width, int height) 
 	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
 	try {
 		init (data);
-		init ();		
+		init ();
 	} finally {
 		if (pool != null) pool.release();
 	}
@@ -1770,6 +1772,11 @@ public void setBackground(Color color) {
 public String toString () {
 	if (isDisposed()) return "Image {*DISPOSED*}";
 	return "Image {" + handle + "}";
+}
+
+@Override
+protected void allocateNativeResource() {
+	this.initializer.run();
 }
 
 }
