@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2022 IBM Corporation and others.
+ * Copyright (c) 2000, 2025 IBM Corporation and others.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -21,6 +21,7 @@ import org.eclipse.swt.*;
 import org.eclipse.swt.internal.*;
 import org.eclipse.swt.internal.DPIUtil.*;
 import org.eclipse.swt.internal.gdip.*;
+import org.eclipse.swt.internal.image.*;
 import org.eclipse.swt.internal.win32.*;
 
 /**
@@ -363,7 +364,7 @@ public Image(Device device, ImageData data) {
 	super(device);
 	if (data == null) SWT.error(SWT.ERROR_NULL_ARGUMENT);
 	initialNativeZoom = DPIUtil.getNativeDeviceZoom();
-	data = DPIUtil.autoScaleUp(device, new ElementAtZoom<>(data, 100));
+	data = DPIUtil.autoScaleImageData(device, data, 100);
 	init(data, getZoom());
 	init();
 	this.device.registerResourceWithZoomSupport(this);
@@ -471,8 +472,9 @@ public Image(Device device, ImageData source, ImageData mask) {
 public Image (Device device, InputStream stream) {
 	super(device);
 	initialNativeZoom = DPIUtil.getNativeDeviceZoom();
-	ImageData data = DPIUtil.autoScaleUp(device, new ElementAtZoom<>(new ImageData (stream), 100));
-	init(data, getZoom());
+	int deviceZoom = getZoom();
+	ImageData data = DPIUtil.autoScaleUp(device, ImageDataLoader.load(stream, FileFormat.DEFAULT_ZOOM, deviceZoom));
+	init(data, deviceZoom);
 	init();
 	this.device.registerResourceWithZoomSupport(this);
 }
@@ -513,8 +515,9 @@ public Image (Device device, String filename) {
 	super(device);
 	if (filename == null) SWT.error(SWT.ERROR_NULL_ARGUMENT);
 	initialNativeZoom = DPIUtil.getNativeDeviceZoom();
-	ImageData data = DPIUtil.autoScaleUp(device, new ElementAtZoom<>(new ImageData (filename), 100));
-	init(data, getZoom());
+	int deviceZoom = getZoom();
+	ImageData data = DPIUtil.autoScaleUp(device, ImageDataLoader.load(filename, FileFormat.DEFAULT_ZOOM, deviceZoom));
+	init(data, deviceZoom);
 	init();
 	this.device.registerResourceWithZoomSupport(this);
 }
@@ -552,15 +555,17 @@ public Image(Device device, ImageFileNameProvider imageFileNameProvider) {
 	super(device);
 	this.imageProvider = new ImageFileNameProviderWrapper(imageFileNameProvider);
 	initialNativeZoom = DPIUtil.getNativeDeviceZoom();
-	ElementAtZoom<String> fileName = DPIUtil.validateAndGetImagePathAtZoom (imageFileNameProvider, getZoom());
-	if (fileName.zoom() == getZoom()) {
-		ImageHandle imageMetadata = initNative (fileName.element(), getZoom());
+	int deviceZoom = getZoom();
+	ElementAtZoom<String> fileName = DPIUtil.validateAndGetImagePathAtZoom(imageFileNameProvider, deviceZoom);
+	ElementAtZoom<ImageData> imageData = ImageDataLoader.load(fileName.element(), fileName.zoom(), deviceZoom);
+	if (imageData.zoom() == deviceZoom) {
+		ImageHandle imageMetadata = initNative(fileName.element(), deviceZoom);
 		if (imageMetadata == null) {
-			init(new ImageData (fileName.element()), getZoom());
+			init(imageData.element(), deviceZoom);
 		}
 	} else {
-		ImageData resizedData = DPIUtil.autoScaleImageData (device, new ImageData (fileName.element()), fileName.zoom());
-		init(resizedData, getZoom());
+		ImageData resizedData = DPIUtil.autoScaleUp(device, imageData);
+		init(resizedData, deviceZoom);
 	}
 	init();
 	this.device.registerResourceWithZoomSupport(this);

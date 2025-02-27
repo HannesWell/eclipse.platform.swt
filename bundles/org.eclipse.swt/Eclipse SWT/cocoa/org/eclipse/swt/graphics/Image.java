@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2020 IBM Corporation and others.
+ * Copyright (c) 2000, 2025 IBM Corporation and others.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -19,6 +19,7 @@ import java.util.*;
 
 import org.eclipse.swt.*;
 import org.eclipse.swt.internal.*;
+import org.eclipse.swt.internal.DPIUtil.*;
 import org.eclipse.swt.internal.cocoa.*;
 import org.eclipse.swt.internal.graphics.*;
 
@@ -692,6 +693,7 @@ public Image(Device device, InputStream stream) {
 	NSAutoreleasePool pool = null;
 	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
 	try {
+		// TODO: scale SVGs here too?
 		init(new ImageData(stream));
 		init();
 	} finally {
@@ -738,6 +740,7 @@ public Image(Device device, String filename) {
 	try {
 		if (filename == null) SWT.error(SWT.ERROR_NULL_ARGUMENT);
 		initNative(filename);
+		// TODO: scale SVGs here too?
 		if (this.handle == null) init(new ImageData(filename));
 		init();
 	} finally {
@@ -778,6 +781,7 @@ public Image(Device device, ImageFileNameProvider imageFileNameProvider) {
 	super(device);
 	if (imageFileNameProvider == null) SWT.error(SWT.ERROR_NULL_ARGUMENT);
 	this.imageFileNameProvider = imageFileNameProvider;
+	//TODO: implement fine-grained zoom handling here as well?
 	String filename = imageFileNameProvider.getImagePath(100);
 	if (filename == null) SWT.error(SWT.ERROR_INVALID_ARGUMENT);
 	NSAutoreleasePool pool = null;
@@ -792,6 +796,14 @@ public Image(Device device, ImageFileNameProvider imageFileNameProvider) {
 			id id = NSImageRep.imageRepWithContentsOfFile(NSString.stringWith(filename2x));
 			NSImageRep rep = new NSImageRep(id);
 			handle.addRepresentation(rep);
+		} else {
+			// Try to natively scale up the image (e.g. possible if it's an SVG)
+			ElementAtZoom<ImageData> imageData2x = ImageDataLoader.load(filename, 100, 200);
+			if (imageData2x.zoom() == 200) {
+				Image image2x = new Image(device, imageData2x.element());
+				NSImageRep rep = ImageUtil.createImageRep(image2x, image2x.width, image2x.height);
+				handle.addRepresentation(rep);
+			}
 		}
 	} finally {
 		if (pool != null) pool.release();
@@ -880,7 +892,7 @@ public Image(Device device, ImageGcDrawer imageGcDrawer, int width, int height) 
 	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
 	try {
 		init (data);
-		init ();		
+		init ();
 	} finally {
 		if (pool != null) pool.release();
 	}
@@ -1193,19 +1205,18 @@ NSBitmapImageRep getRepresentation (int scaleFactor) {
 	NSArray reps = handle.representations();
 	NSSize size = handle.size();
 	long count = reps.count();
-	NSSize targetSize = new NSSize();
-	targetSize.width = (int)size.width * scaleFactor / 100;
-	targetSize.height = (int)size.height * scaleFactor / 100;
+	int width = (int) size.width * scaleFactor / 100;
+	int height = (int) size.height * scaleFactor / 100;
 	NSBitmapImageRep rep;
 	for (int i = 0; i < count; i++) {
 		rep = new NSBitmapImageRep(reps.objectAtIndex(i));
-		if ((targetSize.width == rep.pixelsWide() && targetSize.height == rep.pixelsHigh())) {
+		if (width == rep.pixelsWide() && height == rep.pixelsHigh()) {
 			if (rep.isKindOfClass(OS.class_NSBitmapImageRep)) {
 				return rep;
 			}
 		}
 	}
-	NSBitmapImageRep newRep = createImageRep(targetSize);
+	NSBitmapImageRep newRep = createImageRep(width, height);
 	for (int i = 0; i < count; i++) {
 		handle.removeRepresentation(new NSImageRep(handle.representations().objectAtIndex(0)));
 	}
@@ -1397,8 +1408,8 @@ NSBitmapImageRep getRepresentation () {
 	return getRepresentation (DPIUtil.getDeviceZoom ());
 }
 
-NSBitmapImageRep createImageRep(NSSize targetSize) {
-	return ImageUtil.createImageRep(this, targetSize);
+NSBitmapImageRep createImageRep(int targetWidth, int targetHeight) {
+	return ImageUtil.createImageRep(this, targetWidth, targetHeight);
 }
 
 /**

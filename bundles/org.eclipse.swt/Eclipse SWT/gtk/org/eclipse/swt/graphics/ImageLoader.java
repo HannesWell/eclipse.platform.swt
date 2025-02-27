@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 Red Hat and others. All rights reserved.
+ * Copyright (c) 2019, 2025 Red Hat and others. All rights reserved.
  * The contents of this file are made available under the terms
  * of the GNU Lesser General Public License (LGPL) Version 2.1 that
  * accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.eclipse.swt.*;
 import org.eclipse.swt.internal.*;
+import org.eclipse.swt.internal.DPIUtil.*;
 import org.eclipse.swt.internal.gtk.*;
 import org.eclipse.swt.internal.image.*;
 import org.eclipse.swt.widgets.*;
@@ -159,11 +160,16 @@ void reset() {
  * </ul>
  */
 public ImageData[] load(InputStream stream) {
+	load(stream, FileFormat.DEFAULT_ZOOM, FileFormat.DEFAULT_ZOOM);
+	return data;
+}
+
+List<ElementAtZoom<ImageData>> load(InputStream stream, int fileZoom, int targetZoom) {
 	if (stream == null) SWT.error(SWT.ERROR_NULL_ARGUMENT);
 	reset();
-	ImageData [] imgDataArray = getImageDataArrayFromStream(stream);
-	data = imgDataArray;
-	return imgDataArray;
+	List<ElementAtZoom<ImageData>> images = getImageDataArrayFromStream(stream, fileZoom, targetZoom);
+	data = images.stream().map(ElementAtZoom::element).toArray(ImageData[]::new);
+	return images;
 }
 
 /**
@@ -175,7 +181,7 @@ boolean isInterlacedPNG(byte [] imageAsByteArray) {
 	return imageAsByteArray.length > PNG_INTERLACE_METHOD_OFFSET && imageAsByteArray[PNG_INTERLACE_METHOD_OFFSET] != 0;
 }
 
-ImageData [] getImageDataArrayFromStream(InputStream stream) {
+List<ElementAtZoom<ImageData>> getImageDataArrayFromStream(InputStream stream, int fileZoom, int targetZoom) {
 	long loader = GDK.gdk_pixbuf_loader_new();
 	List<ImageData> imgDataList = new ArrayList<>();
 	try {
@@ -183,6 +189,11 @@ ImageData [] getImageDataArrayFromStream(InputStream stream) {
 		byte[] data_buffer = stream.readAllBytes();
 		if (data_buffer.length == 0) SWT.error(SWT.ERROR_UNSUPPORTED_FORMAT);	// empty stream
 
+		InputStream stream2 = new ByteArrayInputStream(data_buffer);
+		if (FileFormat.isDynamicallySizableFormat(stream2)) {
+			stream2.reset();
+			return FileFormat.load(stream2, this, fileZoom, targetZoom);
+		}
 		// 2) Copy byte array to C memory, write to GdkPixbufLoader
 		long buffer_ptr = OS.g_malloc(data_buffer.length);
 		C.memmove(buffer_ptr, data_buffer, data_buffer.length);
@@ -262,11 +273,12 @@ ImageData [] getImageDataArrayFromStream(InputStream stream) {
 			}
 		}
 		OS.g_free(buffer_ptr);
-		OS.g_object_unref(loader);
 		stream.close();
-		return imgDataArray;
+		return Arrays.stream(imgDataArray).map(i -> new ElementAtZoom<>(i, fileZoom)).toList();
 	} catch (IOException e) {
 		SWT.error(SWT.ERROR_IO);
+	} finally {
+		OS.g_object_unref(loader);
 	}
 	return null;
 }
@@ -290,9 +302,14 @@ ImageData [] getImageDataArrayFromStream(InputStream stream) {
  * </ul>
  */
 public ImageData[] load(String filename) {
+	load(filename, FileFormat.DEFAULT_ZOOM, FileFormat.DEFAULT_ZOOM);
+	return data;
+}
+
+List<ElementAtZoom<ImageData>> load(String filename, int fileZoom, int targetZoom) {
 	if (filename == null) SWT.error(SWT.ERROR_NULL_ARGUMENT);
 	try (InputStream stream = new FileInputStream(filename)) {
-		return load(stream);
+		return load(stream, fileZoom, targetZoom);
 	} catch (IOException e) {
 		SWT.error(SWT.ERROR_IO, e);
 	}
