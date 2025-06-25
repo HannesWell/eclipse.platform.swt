@@ -16,12 +16,14 @@ package org.eclipse.swt.graphics;
 
 import java.io.*;
 import java.util.*;
+import java.util.List;
 
 import org.eclipse.swt.*;
 import org.eclipse.swt.internal.*;
 import org.eclipse.swt.internal.DPIUtil.*;
 import org.eclipse.swt.internal.gdip.*;
 import org.eclipse.swt.internal.win32.*;
+import org.eclipse.swt.widgets.*;
 
 /**
  * Instances of this class are graphics which have been prepared
@@ -176,9 +178,9 @@ public Image(Device device, int width, int height) {
 
 private Image(Device device, int width, int height, int nativeZoom) {
 	super(device);
-	initialNativeZoom = nativeZoom;
-	final int zoom = getZoom();
+	initialNativeZoom = nativeZoom; //TODO: apply this only in initializer (again?)?
 	this.initializer = () -> {
+		final int zoom = getZoom();
 		init(DPIUtil.scaleUp(width, zoom), DPIUtil.scaleUp(height, zoom));
 		init();
 		this.device.registerResourceWithZoomSupport(this);
@@ -224,8 +226,7 @@ private Image(Device device, int width, int height, int nativeZoom) {
  */
 public Image(Device device, Image srcImage, int flag) {
 	super(device);
-	if (srcImage == null) SWT.error(SWT.ERROR_NULL_ARGUMENT);
-	if (srcImage.isDisposed()) SWT.error(SWT.ERROR_INVALID_ARGUMENT);
+	requireNotDisposedArgument(srcImage);
 	//TODO: check what ever is immutable is already copied
 	this.imageProvider = srcImage.imageProvider != null ? srcImage.imageProvider.createCopy(this) : null;
 	this.styleFlag = srcImage.styleFlag | flag;
@@ -326,16 +327,7 @@ public Image(Device device, Image srcImage, int flag) {
  * @see #dispose()
  */
 public Image(Device device, Rectangle bounds) {
-	super(device);
-	if (bounds == null) SWT.error(SWT.ERROR_NULL_ARGUMENT);
-	initialNativeZoom = DPIUtil.getNativeDeviceZoom();
-	this.initializer = () -> {
-		Rectangle scaledBounds = DPIUtil.scaleUp(bounds, getZoom());
-		init(scaledBounds.width, scaledBounds.height);
-		init();
-		this.device.registerResourceWithZoomSupport(this);
-	};
-	this.imageProvider = null;
+	this(device, requireNonNull(bounds).width, bounds.height, DPIUtil.getNativeDeviceZoom());
 }
 
 /**
@@ -363,7 +355,7 @@ public Image(Device device, Rectangle bounds) {
  */
 public Image(Device device, ImageData data) {
 	super(device);
-	if (data == null) SWT.error(SWT.ERROR_NULL_ARGUMENT);
+	requireNonNull(data);
 	this.initializer = () -> {
 		initialNativeZoom = DPIUtil.getNativeDeviceZoom();
 		init(DPIUtil.autoScaleUp(device, new ElementAtZoom<>(data, 100)), getZoom());
@@ -371,6 +363,41 @@ public Image(Device device, ImageData data) {
 		this.device.registerResourceWithZoomSupport(this);
 	};
 	this.imageProvider = null;
+}
+
+private static <T> T requireNonNull(T object) { // TODO: use more
+	if (object == null) {
+		SWT.error(SWT.ERROR_NULL_ARGUMENT);
+	}
+	return object;
+}
+
+static <R extends Resource> R requireNotDisposedArgument(R resource) {
+	if (requireNonNull(resource).isDisposed()) {
+		SWT.error(SWT.ERROR_INVALID_ARGUMENT);
+	}
+	return resource;
+}
+
+static <C extends Control> C requireNotDisposedArgument(C resource) {
+	if (requireNonNull(resource).isDisposed()) {
+		SWT.error(SWT.ERROR_INVALID_ARGUMENT);
+	}
+	return resource;
+}
+
+static <C extends Control> C requireNotDisposed(C control) {
+	if (requireNonNull(control).isDisposed()) {
+		SWT.error(SWT.ERROR_WIDGET_DISPOSED);
+	}
+	return control;
+}
+
+static <R extends Resource> R requireNotDisposedGraphic(R resource) {
+	if (resource.isDisposed()) {
+		SWT.error(SWT.ERROR_GRAPHIC_DISPOSED);
+	}
+	return resource;
 }
 
 /**
@@ -405,8 +432,8 @@ public Image(Device device, ImageData data) {
  */
 public Image(Device device, ImageData source, ImageData mask) {
 	super(device);
-	if (source == null) SWT.error(SWT.ERROR_NULL_ARGUMENT);
-	if (mask == null) SWT.error(SWT.ERROR_NULL_ARGUMENT);
+	requireNonNull(source);
+	requireNonNull(mask);
 	if (source.width != mask.width || source.height != mask.height) {
 		SWT.error(SWT.ERROR_INVALID_ARGUMENT);
 	}
@@ -475,9 +502,10 @@ public Image(Device device, ImageData source, ImageData mask) {
  */
 public Image(Device device, InputStream stream) {
 	super(device);
+	final ImageData imageData = new ImageData(stream); // consume the stream immediately
 	this.initializer = () -> {
 		initialNativeZoom = DPIUtil.getNativeDeviceZoom();
-		ImageData data = DPIUtil.autoScaleUp(device, new ElementAtZoom<>(new ImageData(stream), 100));
+		ImageData data = DPIUtil.autoScaleUp(device, new ElementAtZoom<>(imageData, 100));
 		init(data, getZoom());
 		init();
 		this.device.registerResourceWithZoomSupport(this);
@@ -519,11 +547,11 @@ public Image(Device device, InputStream stream) {
  */
 public Image (Device device, String filename) {
 	super(device);
-	if (filename == null) SWT.error(SWT.ERROR_NULL_ARGUMENT);
+	final ImageData imageData = new ImageData(requireNonNull(filename));
 	this.imageProvider = null;
 	this.initializer = ()->{
 	initialNativeZoom = DPIUtil.getNativeDeviceZoom();
-	ImageData data = DPIUtil.autoScaleUp(device, new ElementAtZoom<>(new ImageData (filename), 100));
+	ImageData data = DPIUtil.autoScaleUp(device, new ElementAtZoom<>(imageData, 100));
 	init(data, getZoom());
 	init();
 	this.device.registerResourceWithZoomSupport(this);
@@ -1046,8 +1074,7 @@ long [] createGdipImage(Integer zoom) {
 					memHdc = OS.CreateCompatibleDC(hDC);
 					device.internal_dispose_GC(hDC, null);
 				}
-				if (srcHdc == 0) SWT.error(SWT.ERROR_NO_HANDLES);
-				if (memHdc == 0) SWT.error(SWT.ERROR_NO_HANDLES);
+				if (srcHdc == 0 || memHdc == 0) SWT.error(SWT.ERROR_NO_HANDLES);
 				long oldSrcBitmap = OS.SelectObject(srcHdc, handle);
 				long memDib = createDIB(imgWidth, imgHeight, 32);
 				if (memDib == 0) SWT.error(SWT.ERROR_NO_HANDLES);
@@ -1275,7 +1302,7 @@ public boolean equals (Object object) {
  */
 public Color getBackground() {
 	try (var n = withNativeResources()) {
-	if (isDisposed()) SWT.error(SWT.ERROR_GRAPHIC_DISPOSED);
+	requireNotDisposedGraphic(this);
 	if (transparentPixel == -1) return null;
 
 	/* Get the HDC for the device */
@@ -1337,13 +1364,13 @@ public Color getBackground() {
  * </ul>
  */
 public Rectangle getBounds() {
-	if (isDisposed()) SWT.error(SWT.ERROR_GRAPHIC_DISPOSED);
+	requireNotDisposedGraphic(this);
 	return getBounds (100);
 }
 
 Rectangle getBounds(int zoom) {
 	try (var n = withNativeResources()) {
-	if (isDisposed()) SWT.error(SWT.ERROR_GRAPHIC_DISPOSED);
+	requireNotDisposedGraphic(this);
 	if (zoomLevelToImageHandle.containsKey(zoom)) {
 		ImageHandle imageMetadata = zoomLevelToImageHandle.get(zoom);
 		Rectangle rectangle = new Rectangle(0, 0, imageMetadata.width, imageMetadata.height);
@@ -1394,7 +1421,7 @@ public Rectangle getBoundsInPixels() {
  * @see ImageData
  */
 public ImageData getImageData() {
-	if (isDisposed()) SWT.error(SWT.ERROR_GRAPHIC_DISPOSED);
+	requireNotDisposedGraphic(this);
 	return getImageData(100);
 }
 
@@ -1429,7 +1456,7 @@ public ImageData getImageData() {
  */
 public ImageData getImageData (int zoom) {
 	try (var n = withNativeResources()) { //TODO: or does it help if done later?
-	if (isDisposed()) SWT.error(SWT.ERROR_GRAPHIC_DISPOSED);
+	requireNotDisposedGraphic(this);
 	if (zoomLevelToImageHandle.containsKey(zoom)) {
 		return zoomLevelToImageHandle.get(zoom).getImageData();
 	}
@@ -1913,7 +1940,7 @@ private static ImageData applyMask(ImageData source, ImageData mask) {
 
 
 void init(ImageData i, Integer zoom) {
-	if (i == null) SWT.error(SWT.ERROR_NULL_ARGUMENT);
+	requireNonNull(i);
 	init(device, this, i, zoom);
 }
 
@@ -1935,7 +1962,8 @@ void init(ImageData i, Integer zoom) {
 @Override
 public long internal_new_GC (GCData data) {
 	referenceNativeResource();
-	if (isDisposed()) SWT.error(SWT.ERROR_GRAPHIC_DISPOSED);
+	requireNotDisposedGraphic(this);
+	this.gcDrew = true;
 	/*
 	* Create a new GC that can draw into the image.
 	* Only supported for bitmaps.
@@ -2041,9 +2069,8 @@ public boolean isDisposed() {
  */
 public void setBackground(Color color) {
 	try (var n = withNativeResources()) {
-	if (isDisposed()) SWT.error(SWT.ERROR_GRAPHIC_DISPOSED);
-	if (color == null) SWT.error(SWT.ERROR_NULL_ARGUMENT);
-	if (color.isDisposed()) SWT.error(SWT.ERROR_INVALID_ARGUMENT);
+	requireNotDisposedGraphic(this);
+	requireNotDisposedArgument(color);
 	zoomLevelToImageHandle.values().forEach(imageHandle -> setBackground(color, imageHandle.handle));
 	}
 }
@@ -2652,6 +2679,7 @@ private class ImageHandle {
 }
 
 private final List<ImageGcDrawer> drawers = new ArrayList<>(0);
+private boolean gcDrew = false;
 
 @Override
 protected void allocateNativeResource() {
@@ -2660,10 +2688,19 @@ protected void allocateNativeResource() {
 	for (ImageGcDrawer drawer : drawers) {
 		drawOnThis(drawer, bounds);
 	}
+	gcDrew = false;
 }
+
 @Override
 protected void releaseNativeResource() {
-	//TODO: if a GC drew on this directly (not via the new or internal methods) save the image-data and restore that?
+	// TODO: if a GC drew on this directly (not via the new or internal methods)
+	// save the image-data and restore that?
+	if (gcDrew) { //TODO: Check if this was a GC that can be re-applied or not. E.g. through the draw() method or alike.
+		ImageData imageData = getImageData(); // TODO: handle case of multiple image-data?
+		this.initializer = () -> {
+
+		};
+	}
 	super.releaseNativeResource();
 }
 
@@ -2672,7 +2709,7 @@ protected void releaseNativeResource() {
  */
 public void draw(ImageGcDrawer drawer) {
 	drawers.add(drawer);
-	if(isReferenced()) {
+	if (isReferenced()) {
 		drawOnThis(drawer, getBounds(getZoom()));
 	}
 }

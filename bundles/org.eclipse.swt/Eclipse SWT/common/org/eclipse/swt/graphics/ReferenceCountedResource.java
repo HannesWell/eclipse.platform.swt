@@ -76,7 +76,7 @@ public abstract class ReferenceCountedResource extends Resource { // TODO: renam
 
 	protected void releaseNativeResource() {
 		dispose();
-		// TODO: use destroy?!
+		// destroy(); // TODO: use destroy?!
 	};
 
 	final DisposeListener disposeListener = e -> unreferenceNativeResource();
