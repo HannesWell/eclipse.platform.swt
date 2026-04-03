@@ -35,31 +35,38 @@ SWT consists of two main parts:
 # Build the entire project
 mvn clean verify
 
-# Build specific platform binary
-mvn clean verify -Dnative=gtk.linux.x86_64
+# Build specific platform binaries too
+mvn clean verify -Dnative=${target.ws}.${target.os}.${target.arch}
 
 # Skip tests
 mvn clean verify -DskipTests
 ```
 
-### Building Natives
+### Building native binaries
 
-**GTK (Linux):**
+**GTK (Linux) or Cocoa (macOS):**
 ```bash
-cd bundles/org.eclipse.swt/Eclipse SWT PI/gtk/library
-./build.sh -gtk-all install    # Build both GTK3 and GTK4
+cd binaries/org.eclipse.swt.${target.ws}.${target.os}.${target.arch}
+mvn clean antrun:run@build-native-binaries -Dnative=${target.ws}.${target.os}.${target.arch} # Build both GTK3 and GTK4
 
-# Build only GTK3
+# If on linux and to build only GTK3
 export GTK_VERSION=3.0
-./build.sh install
+mvn clean antrun:run@build-native-binaries -Dnative=${target.ws}.${target.os}.${target.arch}
 
-# Build only GTK4
+# If on linux and to build only GTK4
 export GTK_VERSION=4.0
-./build.sh install
+mvn clean antrun:run@build-native-binaries -Dnative=${target.ws}.${target.os}.${target.arch}
+```
+**Win32 (Windows)**
+```cmd
+cd binaries\org.eclipse.swt.%target_ws%.%target_os%.%target_arch%
+mvn clean antrun:run@build-native-binaries -Dnative=%target_ws%.%target_os%.%target_arch%
 ```
 
 **CRITICAL**: Files like `os.c`, `os_stats.c`, `os_stats.h` are **auto-generated**. Never edit them directly!
 Instead: modify Java source (e.g., `OS.java`), clean/rebuild the project, then run `./build.sh`.
+
+**CRITICAL**: Never commit any built native binary files to git, i.e. files like `libswt-*.so`, `libswt-*.jnilib` or `swt-*.dll`.
 
 See `docs/gtk-dev-guide.md` for detailed instructions.
 
