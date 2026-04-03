@@ -50,8 +50,11 @@ jobs:
           mkdir -p build/${{ matrix.config.ws }} && mkdir -p build/tmp
           
           cat << EOF > build_${{ matrix.config.ws }}.sh
-          java -Dws=${{ matrix.config.ws }} -Darch=${{ matrix.config.arch }} bundles/org.eclipse.swt/build-scripts/CollectSources.java -nativeSources 'build/${{ matrix.config.ws }}'
-          SWT_JAVA_HOME=${JAVA_HOME} MODEL=${{ matrix.config.arch }} OUTPUT_DIR=build/tmp build.sh install clean
+          pushd bundles/org.eclipse.swt
+          java -Dws=${{ matrix.config.ws }} -Darch=${{ matrix.config.arch }} build-scripts/CollectSources.java -nativeSources "$GITHUB_WORKSPACE/build/${{ matrix.config.ws }}"
+          # TODO: Shouldn't the new files be placed in the original location?
+          SWT_JAVA_HOME=${JAVA_HOME} MODEL=${{ matrix.config.arch }} OUTPUT_DIR=build/tmp $GITHUB_WORKSPACE/build/${{ matrix.config.ws }}/build.sh install clean
+          popd
           EOF
           chmod +x build_${{ matrix.config.ws }}.sh
           
@@ -67,7 +70,7 @@ jobs:
           echo ^
           java -Dws=${{ matrix.config.ws }} -Darch=${{ matrix.config.arch }} bundles\org.eclipse.swt\build-scripts\CollectSources.java -nativeSources 'build\${{ matrix.config.ws }}' ^
           
-          SWT_JAVA_HOME=${JAVA_HOME} MODEL=${{ matrix.config.arch }} OUTPUT_DIR=build\tmp build.sh install clean ^
+          set SWT_JAVA_HOME=${JAVA_HOME} && set MODEL=${{ matrix.config.arch }} && set OUTPUT_DIR=build\tmp build.bat install clean ^
           > build_${{ matrix.config.ws }}.bat
           
           cmd /c build_win32.bat
