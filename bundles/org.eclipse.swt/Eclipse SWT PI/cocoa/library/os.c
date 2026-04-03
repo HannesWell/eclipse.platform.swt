@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2025 IBM Corporation and others.
+ * Copyright (c) 2000, 2026 IBM Corporation and others.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -1091,22 +1091,6 @@ JNIEXPORT void JNICALL OS_NATIVE(CFRunLoopObserverInvalidate)
 }
 #endif
 
-#ifndef NO_CFURLCreateFromFSRef
-JNIEXPORT jlong JNICALL OS_NATIVE(CFURLCreateFromFSRef)
-	(JNIEnv *env, jclass that, jlong arg0, jbyteArray arg1)
-{
-	jbyte *lparg1=NULL;
-	jlong rc = 0;
-	OS_NATIVE_ENTER(env, that, CFURLCreateFromFSRef_FUNC);
-	if (arg1) if ((lparg1 = (*env)->GetByteArrayElements(env, arg1, NULL)) == NULL) goto fail;
-	rc = (jlong)CFURLCreateFromFSRef((CFAllocatorRef)arg0, (FSRef*)lparg1);
-fail:
-	if (arg1 && lparg1) (*env)->ReleaseByteArrayElements(env, arg1, lparg1, 0);
-	OS_NATIVE_EXIT(env, that, CFURLCreateFromFSRef_FUNC);
-	return rc;
-}
-#endif
-
 #ifndef NO_CFURLCreateStringByAddingPercentEscapes
 JNIEXPORT jlong JNICALL OS_NATIVE(CFURLCreateStringByAddingPercentEscapes)
 	(JNIEnv *env, jclass that, jlong arg0, jlong arg1, jlong arg2, jlong arg3, jint arg4)
@@ -1759,22 +1743,6 @@ JNIEXPORT jint JNICALL OS_NATIVE(CGSize_1sizeof)
 }
 #endif
 
-#ifndef NO_CPSSetProcessName
-JNIEXPORT jint JNICALL OS_NATIVE(CPSSetProcessName)
-	(JNIEnv *env, jclass that, jintArray arg0, jlong arg1)
-{
-	jint *lparg0=NULL;
-	jint rc = 0;
-	OS_NATIVE_ENTER(env, that, CPSSetProcessName_FUNC);
-	if (arg0) if ((lparg0 = (*env)->GetIntArrayElements(env, arg0, NULL)) == NULL) goto fail;
-	rc = (jint)CPSSetProcessName(lparg0, arg1);
-fail:
-	if (arg0 && lparg0) (*env)->ReleaseIntArrayElements(env, arg0, lparg0, 0);
-	OS_NATIVE_EXIT(env, that, CPSSetProcessName_FUNC);
-	return rc;
-}
-#endif
-
 #ifndef NO_CTFontManagerRegisterFontsForURL
 JNIEXPORT jboolean JNICALL OS_NATIVE(CTFontManagerRegisterFontsForURL)
 	(JNIEnv *env, jclass that, jlong arg0, jint arg1, jlong arg2)
@@ -1905,22 +1873,6 @@ JNIEXPORT jboolean JNICALL OS_NATIVE(EmptyRgn)
 		}
 	}
 	OS_NATIVE_EXIT(env, that, EmptyRgn_FUNC);
-	return rc;
-}
-#endif
-
-#ifndef NO_GetCurrentProcess
-JNIEXPORT jint JNICALL OS_NATIVE(GetCurrentProcess)
-	(JNIEnv *env, jclass that, jintArray arg0)
-{
-	jint *lparg0=NULL;
-	jint rc = 0;
-	OS_NATIVE_ENTER(env, that, GetCurrentProcess_FUNC);
-	if (arg0) if ((lparg0 = (*env)->GetIntArrayElements(env, arg0, NULL)) == NULL) goto fail;
-	rc = (jint)GetCurrentProcess((ProcessSerialNumber *)lparg0);
-fail:
-	if (arg0 && lparg0) (*env)->ReleaseIntArrayElements(env, arg0, lparg0, 0);
-	OS_NATIVE_EXIT(env, that, GetCurrentProcess_FUNC);
 	return rc;
 }
 #endif
@@ -2102,25 +2054,6 @@ JNIEXPORT jbyte JNICALL OS_NATIVE(LMGetKbdType)
 		}
 	}
 	OS_NATIVE_EXIT(env, that, LMGetKbdType_FUNC);
-	return rc;
-}
-#endif
-
-#ifndef NO_LSGetApplicationForInfo
-JNIEXPORT jlong JNICALL OS_NATIVE(LSGetApplicationForInfo)
-	(JNIEnv *env, jclass that, jint arg0, jint arg1, jlong arg2, jint arg3, jbyteArray arg4, jintArray arg5)
-{
-	jbyte *lparg4=NULL;
-	jint *lparg5=NULL;
-	jlong rc = 0;
-	OS_NATIVE_ENTER(env, that, LSGetApplicationForInfo_FUNC);
-	if (arg4) if ((lparg4 = (*env)->GetByteArrayElements(env, arg4, NULL)) == NULL) goto fail;
-	if (arg5) if ((lparg5 = (*env)->GetIntArrayElements(env, arg5, NULL)) == NULL) goto fail;
-	rc = (jlong)LSGetApplicationForInfo((OSType)arg0, (OSType)arg1, (CFStringRef)arg2, (LSRolesMask)arg3, (FSRef *)lparg4, (CFURLRef *)lparg5);
-fail:
-	if (arg5 && lparg5) (*env)->ReleaseIntArrayElements(env, arg5, lparg5, 0);
-	if (arg4 && lparg4) (*env)->ReleaseByteArrayElements(env, arg4, lparg4, 0);
-	OS_NATIVE_EXIT(env, that, LSGetApplicationForInfo_FUNC);
 	return rc;
 }
 #endif
@@ -3971,6 +3904,18 @@ JNIEXPORT jlong JNICALL OS_NATIVE(NSPrintJobDisposition)
 }
 #endif
 
+#ifndef NO_NSPrintJobSavingURL
+JNIEXPORT jlong JNICALL OS_NATIVE(NSPrintJobSavingURL)
+	(JNIEnv *env, jclass that)
+{
+	jlong rc = 0;
+	OS_NATIVE_ENTER(env, that, NSPrintJobSavingURL_FUNC);
+	rc = (jlong)NSPrintJobSavingURL;
+	OS_NATIVE_EXIT(env, that, NSPrintJobSavingURL_FUNC);
+	return rc;
+}
+#endif
+
 #ifndef NO_NSPrintLastPage
 JNIEXPORT jlong JNICALL OS_NATIVE(NSPrintLastPage)
 	(JNIEnv *env, jclass that)
@@ -4027,18 +3972,6 @@ JNIEXPORT jlong JNICALL OS_NATIVE(NSPrintSaveJob)
 	OS_NATIVE_ENTER(env, that, NSPrintSaveJob_FUNC);
 	rc = (jlong)NSPrintSaveJob;
 	OS_NATIVE_EXIT(env, that, NSPrintSaveJob_FUNC);
-	return rc;
-}
-#endif
-
-#ifndef NO_NSPrintSavePath
-JNIEXPORT jlong JNICALL OS_NATIVE(NSPrintSavePath)
-	(JNIEnv *env, jclass that)
-{
-	jlong rc = 0;
-	OS_NATIVE_ENTER(env, that, NSPrintSavePath_FUNC);
-	rc = (jlong)NSPrintSavePath;
-	OS_NATIVE_EXIT(env, that, NSPrintSavePath_FUNC);
 	return rc;
 }
 #endif
@@ -4667,34 +4600,14 @@ fail:
 }
 #endif
 
-#ifndef NO_SecPolicySearchCopyNext
-JNIEXPORT jint JNICALL OS_NATIVE(SecPolicySearchCopyNext)
-	(JNIEnv *env, jclass that, jlong arg0, jlongArray arg1)
+#ifndef NO_SecPolicyCreateSSL
+JNIEXPORT jlong JNICALL OS_NATIVE(SecPolicyCreateSSL)
+	(JNIEnv *env, jclass that, jboolean arg0, jlong arg1)
 {
-	jlong *lparg1=NULL;
-	jint rc = 0;
-	OS_NATIVE_ENTER(env, that, SecPolicySearchCopyNext_FUNC);
-	if (arg1) if ((lparg1 = (*env)->GetLongArrayElements(env, arg1, NULL)) == NULL) goto fail;
-	rc = (jint)SecPolicySearchCopyNext((SecPolicySearchRef)arg0, (SecPolicyRef *)lparg1);
-fail:
-	if (arg1 && lparg1) (*env)->ReleaseLongArrayElements(env, arg1, lparg1, 0);
-	OS_NATIVE_EXIT(env, that, SecPolicySearchCopyNext_FUNC);
-	return rc;
-}
-#endif
-
-#ifndef NO_SecPolicySearchCreate
-JNIEXPORT jint JNICALL OS_NATIVE(SecPolicySearchCreate)
-	(JNIEnv *env, jclass that, jlong arg0, jlong arg1, jlong arg2, jlongArray arg3)
-{
-	jlong *lparg3=NULL;
-	jint rc = 0;
-	OS_NATIVE_ENTER(env, that, SecPolicySearchCreate_FUNC);
-	if (arg3) if ((lparg3 = (*env)->GetLongArrayElements(env, arg3, NULL)) == NULL) goto fail;
-	rc = (jint)SecPolicySearchCreate((CSSM_CERT_TYPE)arg0, (CSSM_OID *)arg1, (CSSM_DATA *)arg2, (SecPolicySearchRef *)lparg3);
-fail:
-	if (arg3 && lparg3) (*env)->ReleaseLongArrayElements(env, arg3, lparg3, 0);
-	OS_NATIVE_EXIT(env, that, SecPolicySearchCreate_FUNC);
+	jlong rc = 0;
+	OS_NATIVE_ENTER(env, that, SecPolicyCreateSSL_FUNC);
+	rc = (jlong)SecPolicyCreateSSL(arg0, (CFStringRef)arg1);
+	OS_NATIVE_EXIT(env, that, SecPolicyCreateSSL_FUNC);
 	return rc;
 }
 #endif
@@ -5019,18 +4932,6 @@ JNIEXPORT void JNICALL OS_NATIVE(instrumentObjcMessageSends)
 		}
 	}
 	OS_NATIVE_EXIT(env, that, instrumentObjcMessageSends_FUNC);
-}
-#endif
-
-#ifndef NO_kCFAllocatorDefault
-JNIEXPORT jlong JNICALL OS_NATIVE(kCFAllocatorDefault)
-	(JNIEnv *env, jclass that)
-{
-	jlong rc = 0;
-	OS_NATIVE_ENTER(env, that, kCFAllocatorDefault_FUNC);
-	rc = (jlong)kCFAllocatorDefault;
-	OS_NATIVE_EXIT(env, that, kCFAllocatorDefault_FUNC);
-	return rc;
 }
 #endif
 

@@ -63,25 +63,18 @@ public static Program findProgram (String extension) {
 		if (extension == null) SWT.error (SWT.ERROR_NULL_ARGUMENT);
 		if (extension.length () == 0) return null;
 		Program program = null;
-		char[] chars;
+		String extStr;
 		if (extension.charAt (0) != '.') {
-			chars = new char[extension.length()];
-			extension.getChars(0, chars.length, chars, 0);
+			extStr = extension;
 		} else {
-			chars = new char[extension.length() - 1];
-			extension.getChars(1, extension.length(), chars, 0);
+			extStr = extension.substring(1);
 		}
-		NSString ext = NSString.stringWithCharacters(chars, chars.length);
-		if (ext != null) {
-			byte[] fsRef = new byte[80];
-			if (OS.LSGetApplicationForInfo(OS.kLSUnknownType, OS.kLSUnknownCreator, ext.id, OS.kLSRolesAll, fsRef, null) == OS.noErr) {
-				long url = OS.CFURLCreateFromFSRef(OS.kCFAllocatorDefault(), fsRef);
-				if (url != 0) {
-					NSString bundlePath = new NSURL(url).path();
-					NSBundle bundle = NSBundle.bundleWithPath(bundlePath);
-					if (bundle != null) program = getProgram(bundle);
-					OS.CFRelease(url);
-				}
+		NSURL fileURL = NSURL.fileURLWithPath(NSString.stringWith("/tmp/file." + extStr));
+		if (fileURL != null) {
+			NSURL appURL = NSWorkspace.sharedWorkspace().URLForApplicationToOpenURL(fileURL);
+			if (appURL != null) {
+				NSBundle bundle = NSBundle.bundleWithPath(appURL.path());
+				if (bundle != null) program = getProgram(bundle);
 			}
 		}
 		return program;

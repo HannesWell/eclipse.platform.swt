@@ -96,6 +96,7 @@ public enum Selector {
 	, sel_PMPrintSettings("PMPrintSettings")
 	, sel_TIFFRepresentation("TIFFRepresentation")
 	, sel_URL("URL")
+	, sel_URLForApplicationToOpenURL_("URLForApplicationToOpenURL:")
 	, sel_URLFromPasteboard_("URLFromPasteboard:")
 	, sel_URLWithString_("URLWithString:")
 	, sel_UTF8String("UTF8String")

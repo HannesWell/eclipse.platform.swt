@@ -179,7 +179,7 @@ public PrinterData open() {
 		dict.setValue(OS.NSPrintSaveJob, OS.NSPrintJobDisposition);
 	}
 	if (printerData.fileName != null && printerData.fileName.length() > 0) {
-		dict.setValue(NSString.stringWith(printerData.fileName), OS.NSPrintSavePath);
+		dict.setValue(NSURL.fileURLWithPath(NSString.stringWith(printerData.fileName)), OS.NSPrintJobSavingURL);
 	}
 	dict.setValue(NSNumber.numberWithBool(printerData.scope == PrinterData.ALL_PAGES), OS.NSPrintAllPages);
 	if (printerData.scope == PrinterData.PAGE_RANGE) {
@@ -217,8 +217,8 @@ public PrinterData open() {
 		data = new PrinterData(Printer.DRIVER, str.getString());
 		data.printToFile = printInfo.jobDisposition().isEqual(OS.NSPrintSaveJob);
 		if (data.printToFile) {
-			NSString filename = new NSString(dict.objectForKey(OS.NSPrintSavePath));
-			data.fileName = filename.getString();
+			NSURL fileURL = new NSURL(dict.objectForKey(OS.NSPrintJobSavingURL));
+			data.fileName = fileURL.path().getString();
 		}
 		if (printInfo.isSelectionOnly ()) {
 			data.scope = PrinterData.SELECTION;

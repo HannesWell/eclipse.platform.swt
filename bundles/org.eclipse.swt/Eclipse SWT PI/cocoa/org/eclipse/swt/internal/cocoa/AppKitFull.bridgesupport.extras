@@ -4332,8 +4332,8 @@
 	<constant name="NSPrintMustCollate" swt_gen="true"></constant>
 	<constant name="NSPrintOrientation" swt_gen="true"></constant>
 	<constant name="NSPrintPreviewJob" swt_gen="true"></constant>
+	<constant name="NSPrintJobSavingURL" swt_gen="true"></constant>
 	<constant name="NSPrintSaveJob" swt_gen="true"></constant>
-	<constant name="NSPrintSavePath" swt_gen="true"></constant>
 	<constant name="NSPrintScalingFactor" swt_gen="true"></constant>
 	<constant name="NSSquareStatusItemLength" swt_gen="true"></constant>
 	<constant name="NSStrikethroughColorAttributeName" swt_gen="true"></constant>
