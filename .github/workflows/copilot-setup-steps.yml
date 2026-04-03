@@ -4,7 +4,7 @@ name: "Copilot Setup Steps"
 # allow manual testing through the repository's "Actions" tab
 on:
   workflow_dispatch:
-  pull_request:
+  push:
     paths:
       - .github/workflows/copilot-setup-steps.yml
 
@@ -54,6 +54,8 @@ jobs:
           SWT_JAVA_HOME=${JAVA_HOME} MODEL=${{ matrix.config.arch }} OUTPUT_DIR=build/tmp build.sh install clean
           EOF
           chmod +x build_${{ matrix.config.ws }}.sh
+          
+          ./build_gtk.sh || ./build_cocoa.sh
 
       - name: Generate Windows build script
         if: ${{ matrix.config.name == 'Windows' }}
@@ -67,3 +69,5 @@ jobs:
           
           SWT_JAVA_HOME=${JAVA_HOME} MODEL=${{ matrix.config.arch }} OUTPUT_DIR=build\tmp build.sh install clean ^
           > build_${{ matrix.config.ws }}.bat
+          
+          cmd /c build_win32.bat
