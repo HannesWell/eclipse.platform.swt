@@ -15,9 +15,9 @@ jobs:
       fail-fast: false
       matrix:
         config: 
-          - { name: Linux,   runner: ubuntu-latest  , ws: 'gtk',   arch: 'x86_64'  }
-          - { name: MacOS,   runner: macos-latest   , ws: 'cocoa', arch: 'aarch64' }
-          - { name: Windows, runner: windows-latest , ws: 'win32', arch: 'x86_64'  }
+          - { os: 'linux' , ws: 'gtk'  , arch: 'x86_64' , runner: ubuntu-latest  }
+          - { os: 'macosx', ws: 'cocoa', arch: 'aarch64', runner: macos-latest   }
+          - { os: 'win32' , ws: 'win32', arch: 'x86_64' , runner: windows-latest }
     runs-on: ${{ matrix.config.runner }}
     permissions:
       contents: read
@@ -39,38 +39,30 @@ jobs:
         with:
           maven-version: '3.9.14'
       - name: Prepare Linux Build
-        if: ${{ matrix.config.name == 'Linux' }}
+        if: ${{ matrix.config.os == 'linux' }}
         run: |
           sudo apt-get update -qq 
           sudo apt-get install -qq -y libgtk-3-dev libgtk-4-dev freeglut3-dev webkit2gtk-driver
 
       - name: Generate Unix build script
-        if: ${{ matrix.config.name == 'Linux' || matrix.config.name == 'MacOS' }}
+        if: ${{ matrix.config.os == 'linux' || matrix.config.os == 'macosx' }}
         run: |
-          mkdir -p build/${{ matrix.config.ws }} && mkdir -p build/tmp
-          
-          cat << EOF > build_${{ matrix.config.ws }}.sh
-          pushd bundles/org.eclipse.swt
-          java -Dws=${{ matrix.config.ws }} -Darch=${{ matrix.config.arch }} build-scripts/CollectSources.java -nativeSources "$GITHUB_WORKSPACE/build/${{ matrix.config.ws }}"
-          # TODO: Shouldn't the new files be placed in the original location?
-          SWT_JAVA_HOME=${JAVA_HOME} MODEL=${{ matrix.config.arch }} OUTPUT_DIR=build/tmp $GITHUB_WORKSPACE/build/${{ matrix.config.ws }}/build.sh install clean
-          popd
+          cat << EOF > build_binaries.sh
+          cd "$GITHUB_WORKSPACE/binaries/org.eclipse.swt.${{ matrix.config.ws }}.${{ matrix.config.os }}.${{ matrix.config.arch }}"
+          mvn clean antrun:run@build-native-binaries -Dnative=${{ matrix.config.ws }}.${{ matrix.config.os }}.${{ matrix.config.arch }}
           EOF
-          chmod +x build_${{ matrix.config.ws }}.sh
+          chmod +x build_binaries.sh
           
-          ./build_gtk.sh || ./build_cocoa.sh
+          ./build_binaries.sh
 
       - name: Generate Windows build script
-        if: ${{ matrix.config.name == 'Windows' }}
+        if: ${{ matrix.config.os == 'win32' }}
         shell: cmd
         run: |
-          mkdir build\${{ matrix.config.ws }}
-          mkdir build\tmp
-          
           echo ^
-          java -Dws=${{ matrix.config.ws }} -Darch=${{ matrix.config.arch }} bundles\org.eclipse.swt\build-scripts\CollectSources.java -nativeSources 'build\${{ matrix.config.ws }}' ^
+          cd "%GITHUB_WORKSPACE%\binaries\org.eclipse.swt.${{ matrix.config.ws }}.${{ matrix.config.os }}.${{ matrix.config.arch }}" ^
           
-          set SWT_JAVA_HOME=${JAVA_HOME} && set MODEL=${{ matrix.config.arch }} && set OUTPUT_DIR=build\tmp build.bat install clean ^
-          > build_${{ matrix.config.ws }}.bat
+          mvn clean antrun:run@build-native-binaries -Dnative=${{ matrix.config.ws }}.${{ matrix.config.os }}.${{ matrix.config.arch }}
+          > build_binaries.bat
           
-          cmd /c build_win32.bat
+          build_binaries.bat
