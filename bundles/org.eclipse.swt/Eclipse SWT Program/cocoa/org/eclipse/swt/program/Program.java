@@ -73,7 +73,7 @@ public static Program findProgram (String extension) {
 		}
 		NSString ext = NSString.stringWithCharacters(chars, chars.length);
 		if (ext != null) {
-			NSURL fileURL = NSURL.fileURLWithPath(NSString.stringWith("/tmp/placeholder.").stringByAppendingString(ext));
+			NSURL fileURL = NSURL.fileURLWithPath(NSString.stringWith(System.getProperty("java.io.tmpdir") + "/placeholder.").stringByAppendingString(ext));
 			NSURL appURL = NSWorkspace.sharedWorkspace().URLForApplicationToOpenURL(fileURL);
 			if (appURL != null) {
 				NSBundle bundle = NSBundle.bundleWithPath(appURL.path());
