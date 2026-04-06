@@ -4,7 +4,7 @@ name: "Copilot Setup Steps"
 # allow manual testing through the repository's "Actions" tab
 on:
   workflow_dispatch:
-  pull_request:
+  push:
     paths:
       - .github/workflows/copilot-setup-steps.yml
 
@@ -14,11 +14,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        config: 
-          - { os: 'linux' , runner: ubuntu-latest  }
-          - { os: 'macosx', runner: macos-latest   }
-          - { os: 'win32' , runner: windows-latest }
-    runs-on: ${{ matrix.config.runner }}
+        include:
+          - os: 'linux'
+            runner: 'ubuntu-latest'
+          - os: 'macosx'
+            runner: 'macos-latest'
+          - os: 'win32'
+            runner: 'windows-latest'
+    runs-on: ${{ matrix.runner }}
     permissions:
       contents: read
     steps:
@@ -39,7 +42,7 @@ jobs:
         with:
           maven-version: '3.9.14'
       - name: Prepare Linux Build
-        if: ${{ matrix.config.os == 'linux' }}
+        if: ${{ matrix.os == 'linux' }}
         run: |
           sudo apt-get update -qq 
           sudo apt-get install -qq -y libgtk-3-dev libgtk-4-dev freeglut3-dev webkit2gtk-driver
