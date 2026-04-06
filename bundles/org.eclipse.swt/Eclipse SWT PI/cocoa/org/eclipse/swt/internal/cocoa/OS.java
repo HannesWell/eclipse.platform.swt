@@ -65,9 +65,6 @@ public class OS extends C {
 	public static final int kUIModeNormal = 0;
 	public static final int kUIModeContentHidden = 2;
 	public static final int kUIModeAllHidden = 3;
-	public static final int kLSUnknownType = 0;
-	public static final int kLSUnknownCreator = 0;
-	public static final int kLSRolesAll = 0xFFFFFFFF;
 	public static final int kAXUnderlineStyleNone = 0x0;
 	public static final int kAXUnderlineStyleSingle = 0x1;
 	public static final int kAXUnderlineStyleThick = 0x2;
@@ -241,9 +238,6 @@ public static final native Object JNIGetObject(long globalRef);
 
 /** Carbon calls */
 
-/** @param psn cast=(ProcessSerialNumber *) */
-public static final native int GetCurrentProcess(int[] psn);
-public static final native int CPSSetProcessName(int[] psn, long name);
 /** @method flags=dynamic */
 /** @method flags=dynamic
 	@param inCreator cast=(OSType)
@@ -313,15 +307,6 @@ public static final native byte LMGetKbdType();
 public static final native long AcquireRootMenu ();
 /** @method flags=dynamic */
 public static final native int CancelMenuTracking (long inRootMenu, boolean inImmediate, int inDismissalReason);
-/**
- * @param inType cast=(OSType)
- * @param inCreator cast=(OSType)
- * @param inExtension cast=(CFStringRef)
- * @param inRoleMask cast=(LSRolesMask)
- * @param outAppRef cast=(FSRef *)
- * @param outAppURL cast=(CFURLRef *)
- */
-public static final native long LSGetApplicationForInfo(int inType, int inCreator,long inExtension, int inRoleMask, byte[] outAppRef, int[] outAppURL);
 /** @method flags=dynamic
  * @param pmSessionInfo cast=(PMPrintSession)
  * @param outPMPrinter cast=(PMPrinter *)
@@ -436,18 +421,12 @@ public static final native void JSStringRelease (long string);
 /** Certificate Security */
 
 /**
- * @param certType cast=(CSSM_CERT_TYPE)
- * @param policyOID cast=(CSSM_OID *)
- * @param value cast=(CSSM_DATA *)
- * @param policySearch cast=(SecPolicySearchRef *)
+ * Creates an SSL certificate policy.
+ * @method flags=no_gen
+ * @param server cast=(Boolean)
+ * @param hostname cast=(CFStringRef)
  */
-public static final native int SecPolicySearchCreate(long certType, long policyOID, long value, long [] policySearch);
-
-/**
- * @param searchRef cast=(SecPolicySearchRef)
- * @param policyRef cast=(SecPolicyRef *)
- */
-public static final native int SecPolicySearchCopyNext(long searchRef, long [] policyRef);
+public static final native long SecPolicyCreateSSL(boolean server, long hostname);
 
 /**
  * @param certificates cast=(CFArrayRef)
@@ -455,8 +434,6 @@ public static final native int SecPolicySearchCopyNext(long searchRef, long [] p
  * @param trustRef cast=(SecTrustRef *)
  */
 public static final native int SecTrustCreateWithCertificates(long certificates, long policies, long [] trustRef);
-
-public static final int CSSM_CERT_X_509v3 = 0x3;
 
 /** Custom callbacks */
 
@@ -853,6 +830,7 @@ public static final long sel_PMPrintSession = Selector.sel_PMPrintSession.value;
 public static final long sel_PMPrintSettings = Selector.sel_PMPrintSettings.value;
 public static final long sel_TIFFRepresentation = Selector.sel_TIFFRepresentation.value;
 public static final long sel_URL = Selector.sel_URL.value;
+public static final long sel_URLForApplicationToOpenURL_ = Selector.sel_URLForApplicationToOpenURL_.value;
 public static final long sel_URLFromPasteboard_ = Selector.sel_URLFromPasteboard_.value;
 public static final long sel_URLWithString_ = Selector.sel_URLWithString_.value;
 public static final long sel_UTF8String = Selector.sel_UTF8String.value;
@@ -2838,9 +2816,13 @@ public static final NSString NSPrintPreviewJob = new NSString(NSPrintPreviewJob(
 /** @method flags=const */
 public static final native long NSPrintSaveJob();
 public static final NSString NSPrintSaveJob = new NSString(NSPrintSaveJob());
-/** @method flags=const */
-public static final native long NSPrintSavePath();
-public static final NSString NSPrintSavePath = new NSString(NSPrintSavePath());
+/**
+ * @method flags=no_gen
+ * Replaces the deprecated NSPrintSavePath constant (deprecated in macOS 10.6).
+ * The value stored in the print info dictionary under this key is an NSURL.
+ */
+public static final native long NSPrintJobSavingURL();
+public static final NSString NSPrintJobSavingURL = new NSString(NSPrintJobSavingURL());
 /** @method flags=const */
 public static final native long NSPrintScalingFactor();
 public static final NSString NSPrintScalingFactor = new NSString(NSPrintScalingFactor());
@@ -2900,8 +2882,6 @@ public static final NSString NSWindowDidResizeNotification = new NSString(NSWind
 /** @method flags=const */
 public static final native long NSWindowWillCloseNotification();
 public static final NSString NSWindowWillCloseNotification = new NSString(NSWindowWillCloseNotification());
-/** @method flags=const */
-public static final native long kCFAllocatorDefault();
 /** @method flags=const */
 public static final native long kCFRunLoopCommonModes();
 /** @method flags=const */
@@ -2975,11 +2955,6 @@ public static final native long CFRunLoopObserverCreate(long allocator, long act
  * @param observer cast=(CFRunLoopObserverRef)
  */
 public static final native void CFRunLoopObserverInvalidate(long observer);
-/**
- * @param allocator cast=(CFAllocatorRef)
- * @param fsRef cast=(FSRef*)
- */
-public static final native long CFURLCreateFromFSRef(long allocator, byte[] fsRef);
 /**
  * @param allocator cast=(CFAllocatorRef)
  * @param originalString cast=(CFStringRef)

@@ -970,32 +970,14 @@ void createDisplay (DeviceData data) {
 	application = NSApplication.sharedApplication();
 	isEmbedded = application.isRunning();
 
-	/*
-	 * Feature in the Macintosh.  On OS 10.2, it is necessary
-	 * to explicitly check in with the Process Manager and set
-	 * the current process to be the front process in order for
-	 * windows to come to the front by default.  The fix is call
-	 * both GetCurrentProcess() and SetFrontProcess().
-	 *
-	 * NOTE: It is not actually necessary to use the process
-	 * serial number returned by GetCurrentProcess() in the
-	 * call to SetFrontProcess() (ie. kCurrentProcess can be
-	 * used) but both functions must be called in order for
-	 * windows to come to the front.
-	 */
-	int [] psn = new int [2];
-	if (OS.GetCurrentProcess (psn) == OS.noErr) {
-		int pid = OS.getpid ();
-		long ptr = getApplicationName().UTF8String();
-		if (ptr != 0) OS.CPSSetProcessName (psn, ptr);
-		ptr = C.getenv (ascii ("APP_ICON_" + pid));
-		if (ptr != 0) {
-			NSString path = NSString.stringWithUTF8String (ptr);
-			NSImage image = (NSImage) new NSImage().alloc();
-			image = image.initByReferencingFile(path);
-			dockImage = image;
-			application.setApplicationIconImage(image);
-		}
+	int pid = OS.getpid ();
+	long ptr = C.getenv (ascii ("APP_ICON_" + pid));
+	if (ptr != 0) {
+		NSString path = NSString.stringWithUTF8String (ptr);
+		NSImage image = (NSImage) new NSImage().alloc();
+		image = image.initByReferencingFile(path);
+		dockImage = image;
+		application.setApplicationIconImage(image);
 	}
 
 	String className = "SWTApplication";

@@ -23,11 +23,10 @@
 #include <Carbon/Carbon.h>
 #include <WebKit/WebKit.h>
 #include <JavaScriptCore/JavaScriptCore.h>
+#include <Security/SecPolicy.h>
 #include "mach-o/dyld.h"
 
 #include "os_custom.h"
-
-extern jint CPSSetProcessName(void *, jlong);
 
 #define OS_LOAD_FUNCTION LOAD_FUNCTION
 

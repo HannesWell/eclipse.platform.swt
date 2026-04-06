@@ -150,3 +150,48 @@ JNIEXPORT jlong JNICALL OS_NATIVE(beginSheetModalForWindow)
 }
 #endif
 
+/*
+ * Custom sel_registerName implementation using a void* intermediate cast
+ * to avoid the "cast of type 'SEL' to 'jlong' is deprecated" warning.
+ * sel_registerName is suppressed from auto-generation via NO_sel_1registerName in os_custom.h.
+ */
+JNIEXPORT jlong JNICALL OS_NATIVE(sel_1registerName)
+	(JNIEnv *env, jclass that, jstring arg0)
+{
+	const char *lparg0 = NULL;
+	jlong rc = 0;
+	if (arg0) if ((lparg0 = (*env)->GetStringUTFChars(env, arg0, NULL)) == NULL) goto fail;
+	rc = (jlong)(void*)sel_registerName(lparg0);
+fail:
+	if (arg0 && lparg0) (*env)->ReleaseStringUTFChars(env, arg0, lparg0);
+	return rc;
+}
+
+/*
+ * NSPrintJobSavingURL constant accessor.
+ * Replaces the deprecated NSPrintSavePath constant (deprecated in macOS 10.6).
+ * The value stored in the dictionary under this key is an NSURL, not an NSString.
+ * NSPrintSavePath is suppressed from auto-generation via NO_NSPrintSavePath in os_custom.h.
+ */
+#ifndef NO_NSPrintJobSavingURL
+JNIEXPORT jlong JNICALL OS_NATIVE(NSPrintJobSavingURL)
+	(JNIEnv *env, jclass that)
+{
+	return (jlong)NSPrintJobSavingURL;
+}
+#endif
+
+/*
+ * SecPolicyCreateSSL wrapper.
+ * Replaces the deprecated SecPolicySearchCreate/SecPolicySearchCopyNext pair
+ * (deprecated in macOS 10.7) for creating SSL certificate policies.
+ * The suppressed functions are excluded via NO_SecPolicySearch* defines in os_custom.h.
+ */
+#ifndef NO_SecPolicyCreateSSL
+JNIEXPORT jlong JNICALL OS_NATIVE(SecPolicyCreateSSL)
+	(JNIEnv *env, jclass that, jboolean arg0, jlong arg1)
+{
+	return (jlong)SecPolicyCreateSSL((Boolean)arg0, (CFStringRef)arg1);
+}
+#endif
+

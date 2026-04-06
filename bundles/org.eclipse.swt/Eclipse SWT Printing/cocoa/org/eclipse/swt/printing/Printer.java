@@ -230,7 +230,7 @@ protected void create(DeviceData deviceData) {
 		dict.setValue(NSNumber.numberWithInt(data.orientation == PrinterData.LANDSCAPE ? OS.NSLandscapeOrientation : OS.NSPortraitOrientation), OS.NSPrintOrientation);
 		if (data.printToFile) {
 			dict.setValue(OS.NSPrintSaveJob, OS.NSPrintJobDisposition);
-			if (data.fileName != null) dict.setValue(NSString.stringWith(data.fileName), OS.NSPrintSavePath);
+			if (data.fileName != null) dict.setValue(NSURL.fileURLWithPath(NSString.stringWith(data.fileName)), OS.NSPrintJobSavingURL);
 		}
 		/*
 		* Bug in Cocoa.  For some reason, the output still goes to the printer when

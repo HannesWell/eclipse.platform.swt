@@ -45,6 +45,11 @@ public boolean openURL(NSURL url) {
 	return OS.objc_msgSend_bool(this.id, OS.sel_openURL_, url != null ? url.id : 0);
 }
 
+public NSURL URLForApplicationToOpenURL(NSURL url) {
+	long result = OS.objc_msgSend(this.id, OS.sel_URLForApplicationToOpenURL_, url != null ? url.id : 0);
+	return result != 0 ? new NSURL(result) : null;
+}
+
 public boolean openURLs(NSArray urls, NSString bundleIdentifier, long options, NSAppleEventDescriptor descriptor, long identifiers) {
 	return OS.objc_msgSend_bool(this.id, OS.sel_openURLs_withAppBundleIdentifier_options_additionalEventParamDescriptor_launchIdentifiers_, urls != null ? urls.id : 0, bundleIdentifier != null ? bundleIdentifier.id : 0, options, descriptor != null ? descriptor.id : 0, identifiers);
 }

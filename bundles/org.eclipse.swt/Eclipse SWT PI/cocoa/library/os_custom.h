@@ -73,3 +73,13 @@
 #define CGDisplayBitsPerPixel_LIB "com.apple.ApplicationServices"
 #define CGDisplayBitsPerSample_LIB "com.apple.ApplicationServices"
 #define CGDisplayBytesPerRow_LIB "com.apple.ApplicationServices"
+
+/* Suppress deprecated macOS APIs - replaced by custom implementations or removed */
+#define NO_GetCurrentProcess
+#define NO_CPSSetProcessName
+#define NO_LSGetApplicationForInfo
+#define NO_CFURLCreateFromFSRef
+#define NO_NSPrintSavePath
+#define NO_SecPolicySearchCreate
+#define NO_SecPolicySearchCopyNext
+#define NO_sel_1registerName

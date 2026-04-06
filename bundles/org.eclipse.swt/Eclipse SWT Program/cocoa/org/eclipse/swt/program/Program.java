@@ -73,15 +73,11 @@ public static Program findProgram (String extension) {
 		}
 		NSString ext = NSString.stringWithCharacters(chars, chars.length);
 		if (ext != null) {
-			byte[] fsRef = new byte[80];
-			if (OS.LSGetApplicationForInfo(OS.kLSUnknownType, OS.kLSUnknownCreator, ext.id, OS.kLSRolesAll, fsRef, null) == OS.noErr) {
-				long url = OS.CFURLCreateFromFSRef(OS.kCFAllocatorDefault(), fsRef);
-				if (url != 0) {
-					NSString bundlePath = new NSURL(url).path();
-					NSBundle bundle = NSBundle.bundleWithPath(bundlePath);
-					if (bundle != null) program = getProgram(bundle);
-					OS.CFRelease(url);
-				}
+			NSURL fileURL = NSURL.fileURLWithPath(NSString.stringWith("/tmp/placeholder.").stringByAppendingString(ext));
+			NSURL appURL = NSWorkspace.sharedWorkspace().URLForApplicationToOpenURL(fileURL);
+			if (appURL != null) {
+				NSBundle bundle = NSBundle.bundleWithPath(appURL.path());
+				if (bundle != null) program = getProgram(bundle);
 			}
 		}
 		return program;
