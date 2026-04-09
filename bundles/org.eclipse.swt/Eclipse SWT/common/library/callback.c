@@ -45,9 +45,8 @@ static jmethodID mid_Throwable_addSuppressed = NULL;
 #endif
 
 #ifdef ATOMIC
-#include <libkern/OSAtomic.h>
-#define ATOMIC_INC(value) OSAtomicIncrement32(&value);
-#define ATOMIC_DEC(value) OSAtomicDecrement32(&value);
+#define ATOMIC_INC(value) __sync_fetch_and_add(&value, 1);
+#define ATOMIC_DEC(value) __sync_fetch_and_sub(&value, 1);
 #else
 #define ATOMIC_INC(value) value++;
 #define ATOMIC_DEC(value) value--;
