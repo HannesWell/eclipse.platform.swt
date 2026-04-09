@@ -25,11 +25,24 @@
 /* define this to print out debug statements */
 /* #define DEBUG_CALL_PRINTS */
 
+#ifdef ATOMIC
+#include <stdatomic.h>
+#define ATOMIC_INC(value) atomic_fetch_add_explicit(&value, 1, memory_order_seq_cst);
+#define ATOMIC_DEC(value) atomic_fetch_sub_explicit(&value, 1, memory_order_seq_cst);
+#else
+#define ATOMIC_INC(value) value++;
+#define ATOMIC_DEC(value) value--;
+#endif
+
 /* --------------- callback globals ----------------- */
 
 static CALLBACK_DATA callbackData[MAX_CALLBACKS];
 static int callbackEnabled = 1;
+#ifdef ATOMIC
+static _Atomic int callbackEntryCount = 0;
+#else
 static int callbackEntryCount = 0;
+#endif
 static int initialized = 0;
 static jmethodID mid_Throwable_addSuppressed = NULL;
 
@@ -42,14 +55,6 @@ static jmethodID mid_Throwable_addSuppressed = NULL;
 		#include <dlfcn.h>
 		#include <gdk/gdk.h>
 	#endif
-#endif
-
-#ifdef ATOMIC
-#define ATOMIC_INC(value) __sync_fetch_and_add(&value, 1);
-#define ATOMIC_DEC(value) __sync_fetch_and_sub(&value, 1);
-#else
-#define ATOMIC_INC(value) value++;
-#define ATOMIC_DEC(value) value--;
 #endif
 
 jlong callback(int index, ...);
