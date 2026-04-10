@@ -33,12 +33,8 @@ import org.eclipse.swt.internal.cocoa.*;
 public class URLTransfer extends ByteArrayTransfer {
 
 	static URLTransfer _instance = new URLTransfer();
-	// XXX: SWT uses the deprecated format name here,
-	// the new name is "public.url" aka NSPasteboardTypeURL
-	static final String URL = OS.NSURLPboardType.getString();
-	static final String URL1 = OS.kUTTypeURL.getString();
+	static final String URL = OS.NSPasteboardTypeURL.getString();
 	static final int URL_ID = registerType(URL);
-	static final int URL_ID1 = registerType(URL1);
 
 private URLTransfer() {}
 
@@ -93,12 +89,12 @@ public Object nativeToJava(TransferData transferData){
 
 @Override
 protected int[] getTypeIds(){
-	return new int[] {URL_ID, URL_ID1};
+	return new int[] {URL_ID};
 }
 
 @Override
 protected String[] getTypeNames(){
-	return new String[] {URL, URL1};
+	return new String[] {URL};
 }
 
 boolean checkURL(Object object) {

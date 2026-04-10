@@ -2868,8 +2868,14 @@ public static final NSString NSToolbarFlexibleSpaceItemIdentifier = new NSString
 public static final native long NSToolbarSpaceItemIdentifier();
 public static final NSString NSToolbarSpaceItemIdentifier = new NSString(NSToolbarSpaceItemIdentifier());
 /** @method flags=const */
+/** @deprecated Use NSPasteboardTypeURL instead */
+@Deprecated
 public static final native long NSURLPboardType();
+/** @deprecated Use NSPasteboardTypeURL instead */
+@Deprecated
 public static final NSString NSURLPboardType = new NSString(NSURLPboardType());
+/** Replacement for deprecated NSURLPboardType, has the same value as kUTTypeURL ("public.url") */
+public static final NSString NSPasteboardTypeURL = kUTTypeURL;
 /** @method flags=const */
 public static final native long NSUnderlineColorAttributeName();
 public static final NSString NSUnderlineColorAttributeName = new NSString(NSUnderlineColorAttributeName());
