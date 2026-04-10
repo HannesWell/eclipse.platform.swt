@@ -802,6 +802,7 @@ public enum Selector {
 	, sel_protectionSpace("protectionSpace")
 	, sel_push("push")
 	, sel_rangeValue("rangeValue")
+	, sel_readObjectsForClasses_options_("readObjectsForClasses:options:")
 	, sel_readSelectionFromPasteboard_("readSelectionFromPasteboard:")
 	, sel_realm("realm")
 	, sel_recentSearches("recentSearches")

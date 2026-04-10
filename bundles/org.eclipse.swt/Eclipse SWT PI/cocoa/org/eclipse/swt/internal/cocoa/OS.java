@@ -1559,6 +1559,7 @@ public static final long sel_proposedCredential = Selector.sel_proposedCredentia
 public static final long sel_protectionSpace = Selector.sel_protectionSpace.value;
 public static final long sel_push = Selector.sel_push.value;
 public static final long sel_rangeValue = Selector.sel_rangeValue.value;
+public static final long sel_readObjectsForClasses_options_ = Selector.sel_readObjectsForClasses_options_.value;
 public static final long sel_readSelectionFromPasteboard_ = Selector.sel_readSelectionFromPasteboard_.value;
 public static final long sel_realm = Selector.sel_realm.value;
 public static final long sel_recentSearches = Selector.sel_recentSearches.value;

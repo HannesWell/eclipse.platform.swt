@@ -308,7 +308,8 @@ public Object getContents(Transfer transfer, int clipboards) {
 			if (propertyList == null) return null;
 			tdata.data = new NSArray(propertyList.id);
 		} else if (type.isEqual(OS.NSPasteboardTypeURL)) {
-			tdata.data = NSURL.URLFromPasteboard(pasteboard);
+			NSArray urls = pasteboard.readObjectsForClasses(NSArray.arrayWithObject(new id(OS.class_NSURL)), null);
+			tdata.data = (urls != null && urls.count() > 0) ? new NSURL(urls.objectAtIndex(0).id) : null;
 		} else {
 			tdata.data = pasteboard.dataForType(type);
 		}

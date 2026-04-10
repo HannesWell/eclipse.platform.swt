@@ -718,7 +718,8 @@ boolean drop(NSObject sender) {
 				type.isEqual(OS.NSPasteboardTypeRTF)) {
 			tdata.data = pasteboard.stringForType(type);
 		} else if (type.isEqual(OS.NSPasteboardTypeURL)) {
-			tdata.data = NSURL.URLFromPasteboard(pasteboard);
+			NSArray urls = pasteboard.readObjectsForClasses(NSArray.arrayWithObject(new id(OS.class_NSURL)), null);
+			tdata.data = (urls != null && urls.count() > 0) ? new NSURL(urls.objectAtIndex(0).id) : null;
 		} else if (type.isEqual(OS.NSFilenamesPboardType) || type.isEqual(OS.kUTTypeFileURL)) {
 			tdata.data = new NSArray(pasteboard.propertyListForType(OS.NSFilenamesPboardType).id);
 		} else {
