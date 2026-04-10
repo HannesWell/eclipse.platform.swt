@@ -853,7 +853,6 @@ public static final long sel_PMPrintSession = Selector.sel_PMPrintSession.value;
 public static final long sel_PMPrintSettings = Selector.sel_PMPrintSettings.value;
 public static final long sel_TIFFRepresentation = Selector.sel_TIFFRepresentation.value;
 public static final long sel_URL = Selector.sel_URL.value;
-public static final long sel_URLFromPasteboard_ = Selector.sel_URLFromPasteboard_.value;
 public static final long sel_URLWithString_ = Selector.sel_URLWithString_.value;
 public static final long sel_UTF8String = Selector.sel_UTF8String.value;
 public static final long sel_abortEditing = Selector.sel_abortEditing.value;
@@ -1559,6 +1558,7 @@ public static final long sel_proposedCredential = Selector.sel_proposedCredentia
 public static final long sel_protectionSpace = Selector.sel_protectionSpace.value;
 public static final long sel_push = Selector.sel_push.value;
 public static final long sel_rangeValue = Selector.sel_rangeValue.value;
+public static final long sel_readObjectsForClasses_options_ = Selector.sel_readObjectsForClasses_options_.value;
 public static final long sel_readSelectionFromPasteboard_ = Selector.sel_readSelectionFromPasteboard_.value;
 public static final long sel_realm = Selector.sel_realm.value;
 public static final long sel_recentSearches = Selector.sel_recentSearches.value;
@@ -2867,9 +2867,8 @@ public static final NSString NSToolbarFlexibleSpaceItemIdentifier = new NSString
 /** @method flags=const */
 public static final native long NSToolbarSpaceItemIdentifier();
 public static final NSString NSToolbarSpaceItemIdentifier = new NSString(NSToolbarSpaceItemIdentifier());
-/** @method flags=const */
-public static final native long NSURLPboardType();
-public static final NSString NSURLPboardType = new NSString(NSURLPboardType());
+/** Same value as kUTTypeURL ("public.url") */
+public static final NSString NSPasteboardTypeURL = kUTTypeURL;
 /** @method flags=const */
 public static final native long NSUnderlineColorAttributeName();
 public static final NSString NSUnderlineColorAttributeName = new NSString(NSUnderlineColorAttributeName());

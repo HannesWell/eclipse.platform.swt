@@ -82,6 +82,11 @@ public NSArray types() {
 	return result != 0 ? new NSArray(result) : null;
 }
 
+public NSArray readObjectsForClasses(NSArray classArray, NSDictionary options) {
+	long result = OS.objc_msgSend(this.id, OS.sel_readObjectsForClasses_options_, classArray != null ? classArray.id : 0, options != null ? options.id : 0);
+	return result != 0 ? new NSArray(result) : null;
+}
+
 public boolean writeObjects(NSArray objects) {
 	return OS.objc_msgSend_bool(this.id, OS.sel_writeObjects_, objects != null ? objects.id : 0);
 }

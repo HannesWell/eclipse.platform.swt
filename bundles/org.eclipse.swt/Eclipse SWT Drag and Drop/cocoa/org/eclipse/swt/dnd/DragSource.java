@@ -736,7 +736,7 @@ void pasteboard_provideDataForType(long id, long sel, long arg0, long arg1) {
 			dataType.isEqual(OS.NSPasteboardTypeHTML) ||
 			dataType.isEqual(OS.NSPasteboardTypeRTF)) {
 		pasteboard.setString((NSString) tdata, dataType);
-	} else if (dataType.isEqual(OS.NSURLPboardType) || dataType.isEqual(OS.kUTTypeURL)) {
+	} else if (dataType.isEqual(OS.NSPasteboardTypeURL)) {
 		NSURL url = (NSURL) tdata;
 		pasteboard.writeObjects(NSArray.arrayWithObject(url));
 	} else if (dataType.isEqual(OS.NSFilenamesPboardType) || dataType.isEqual(OS.kUTTypeFileURL)) {
