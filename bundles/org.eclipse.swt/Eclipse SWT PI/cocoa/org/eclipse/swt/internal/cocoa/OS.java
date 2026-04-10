@@ -853,7 +853,6 @@ public static final long sel_PMPrintSession = Selector.sel_PMPrintSession.value;
 public static final long sel_PMPrintSettings = Selector.sel_PMPrintSettings.value;
 public static final long sel_TIFFRepresentation = Selector.sel_TIFFRepresentation.value;
 public static final long sel_URL = Selector.sel_URL.value;
-public static final long sel_URLFromPasteboard_ = Selector.sel_URLFromPasteboard_.value;
 public static final long sel_URLWithString_ = Selector.sel_URLWithString_.value;
 public static final long sel_UTF8String = Selector.sel_UTF8String.value;
 public static final long sel_abortEditing = Selector.sel_abortEditing.value;
