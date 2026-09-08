@@ -20,11 +20,6 @@ import org.eclipse.swt.*;
  * Instances of this store color information. To create a color you can either
  * specify the individual color components as integers in the range
  * 0 to 255 or provide an instance of an <code>RGB</code> or <code>RGBA</code>.
- * <p>
- * Colors do not need to be disposed, however to maintain compatibility
- * with older code, disposing a Color is not an error. As Colors do not require
- * disposal, the constructors which do not require a Device are recommended.
- * </p>
  *
  * @see RGB
  * @see RGBA
